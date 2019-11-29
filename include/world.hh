@@ -5,8 +5,8 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
-
 #include <dbg_macro/dbg.h>
+#include "map.hh"
 
 namespace ed
 {
@@ -14,10 +14,16 @@ namespace ed
 class World
 {
 public:
+  World(float w, float h)
+    : map_{w, h, 2560/w}
+  {
+    //
+  }
   void loop()
   {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
+    // TODO: user config resolution
     sf::RenderWindow window(sf::VideoMode(2560, 1440), "Evolution Dynamics", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
     ImGui::SFML::Init(window);
@@ -39,6 +45,8 @@ public:
       shape.setPosition({200.f, 200.f});
       window.draw(shape);
 
+      map_.render(window);
+
       ImGui::SFML::Render(window);
       window.display();
     }
@@ -47,6 +55,8 @@ public:
   }
 
 private:
+  Map map_;
+
   void configure_imgui_style()
   {
     auto &io = ImGui::GetIO();

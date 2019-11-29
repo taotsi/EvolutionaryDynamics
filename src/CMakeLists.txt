@@ -1,4 +1,4 @@
-add_library(lib_evolutionary_dynamics world.cc imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_widgets.cpp imgui/imgui_demo.cpp imgui/imgui-SFML.cpp)
+add_library(lib_evolutionary_dynamics world.cc map.cc imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_widgets.cpp imgui/imgui_demo.cpp imgui/imgui-SFML.cpp)
 
 target_include_directories(lib_evolutionary_dynamics PUBLIC ${include_dir})
 target_include_directories(lib_evolutionary_dynamics PUBLIC ${extern_include_dir})

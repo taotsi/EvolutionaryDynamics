@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-  ed::World world;
+  ed::World world{50, 20};
   world.loop();
 
   return 0;
