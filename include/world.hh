@@ -6,7 +6,11 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <dbg_macro/dbg.h>
+#include "nlohmann/json.hpp"
 #include "map.hh"
+#include "config.hh"
+
+using json = nlohmann::json;
 
 namespace ed
 {
@@ -14,17 +18,16 @@ namespace ed
 class World
 {
 public:
-  World(float w, float h)
-    : map_{w, h, 2560/w}
+  World(Config &config)
+    : config_{config}, map_{config.map_width, config.map_height, (config.resolution_width - Map::WIDTH_OFFSET) /config.map_width}
   {
     //
   }
   void loop()
   {
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 16;
-    // TODO: user config resolution
-    sf::RenderWindow window(sf::VideoMode(2560, 1440), "Evolution Dynamics", sf::Style::Default, settings);
+    settings.antialiasingLevel = 16; // TODO: set after initializing window
+    sf::RenderWindow window(sf::VideoMode(config_.resolution_width, config_.resolution_height), "Evolution Dynamics", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
     ImGui::SFML::Init(window);
 
@@ -40,11 +43,6 @@ public:
 
       ImGui::ShowDemoWindow();
 
-      sf::CircleShape shape(200, 100);
-      shape.setFillColor(sf::Color(150, 50, 250));
-      shape.setPosition({200.f, 200.f});
-      window.draw(shape);
-
       map_.render(window);
 
       ImGui::SFML::Render(window);
@@ -56,6 +54,7 @@ public:
 
 private:
   Map map_;
+  Config config_;
 
   void configure_imgui_style()
   {
