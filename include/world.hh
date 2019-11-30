@@ -19,31 +19,34 @@ class World
 {
 public:
   World(Config &config)
-    : config_{config}, map_{config.map_width, config.map_height, (config.resolution_width - Map::WIDTH_OFFSET) /config.map_width}
+    : config_{config}, map_{config.map_width, config.map_height, (config.resolution_width - Map::WIDTH_OFFSET) /config.map_width},
+      test_circle_{50}
   {
-    //
+    test_circle_.setFillColor(sf::Color(100, 250, 50));
   }
   void loop()
   {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16; // TODO: set after initializing window
-    sf::RenderWindow window(sf::VideoMode(config_.resolution_width, config_.resolution_height), "Evolution Dynamics", sf::Style::Default, settings);
+    sf::RenderWindow window{sf::VideoMode(config_.resolution_width, config_.resolution_height), "Evolution Dynamics", sf::Style::Default, settings};
     window.setVerticalSyncEnabled(true);
     ImGui::SFML::Init(window);
 
     configure_imgui_style();
 
-    sf::Clock deltaClock;
+    sf::Clock render_clock;
+
     while (window.isOpen())
     {
-      process_input_event(window);
+      process_event(window);
 
-      ImGui::SFML::Update(window, deltaClock.restart());
+      ImGui::SFML::Update(window, render_clock.restart());
       window.clear(sf::Color{20, 20, 20});
 
       ImGui::ShowDemoWindow();
 
-      map_.render(window);
+      update(game_clock_);
+      render(window);
 
       ImGui::SFML::Render(window);
       window.display();
@@ -53,8 +56,12 @@ public:
   }
 
 private:
-  Map map_;
   Config config_;
+  Map map_;
+  sf::Clock game_clock_;
+  int turn_duration_ = 500; // ms // TODO: settable by user
+  bool manual_turn_ = false; // TODO: user
+  sf::CircleShape test_circle_;
 
   void configure_imgui_style()
   {
@@ -66,18 +73,58 @@ private:
     ImGui::StyleColorsLight();
   }
 
-  void process_input_event(sf::RenderWindow &window)
+  void process_event(sf::RenderWindow &window)
   {
     sf::Event event;
     while (window.pollEvent(event))
     {
       ImGui::SFML::ProcessEvent(event);
 
-      if (event.type == sf::Event::Closed)
+      switch(event.type)
       {
+        case sf::Event::Closed:
+        {
           window.close();
+          break;
+        }
+        case sf::Event::KeyPressed:
+        {
+          if(event.key.code == sf::Keyboard::Space)
+          {
+            if(manual_turn_ == false)
+            {
+              manual_turn_ = true;
+            }
+            else
+            {
+              manual_turn_ = false;
+              game_clock_.restart();
+            }
+          }
+        }
+        default:
+        {
+          assert(false);
+        }
       }
     }
+  }
+  void update(sf::Clock &clock)
+  {
+    if(!manual_turn_)
+    {
+      if(clock.getElapsedTime().asMilliseconds() >= turn_duration_)
+      {
+        auto p = test_circle_.getPosition();
+        test_circle_.setPosition(p + sf::Vector2f{20, 10});
+        clock.restart();
+      }
+    }
+  }
+  void render(sf::RenderWindow &window)
+  {
+    map_.render(window);
+    window.draw(test_circle_);
   }
 };
 

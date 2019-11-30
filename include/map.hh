@@ -11,21 +11,22 @@ class Map
 public:
   static constexpr float WIDTH_OFFSET = 10;
   static constexpr float HEIGHT_OFFSET = 10;
+  float GRID_SIZE; // pixel
   Map(size_t w, size_t h, size_t size)
     : width_{static_cast<float>(w)},
       height_{static_cast<float>(h)},
-      grid_size_{static_cast<float>(size)}
+      GRID_SIZE{static_cast<float>(size)}
   {
     for (int i = 0; i <= width_; i++)
     {
-      auto line = sf::RectangleShape{sf::Vector2f{LINE_WIDTH, height_ * grid_size_}};
-      line.setPosition(WIDTH_OFFSET + i * grid_size_, HEIGHT_OFFSET);
+      auto line = sf::RectangleShape{sf::Vector2f{LINE_WIDTH, height_ * GRID_SIZE}};
+      line.setPosition(WIDTH_OFFSET + i * GRID_SIZE, HEIGHT_OFFSET);
       lines_.push_back(line);
     }
     for (int i = 0; i <= height_; i++)
     {
-      auto line = sf::RectangleShape{sf::Vector2f{width_ * grid_size_, LINE_WIDTH}};
-      line.setPosition(WIDTH_OFFSET, HEIGHT_OFFSET + i * grid_size_);
+      auto line = sf::RectangleShape{sf::Vector2f{width_ * GRID_SIZE, LINE_WIDTH}};
+      line.setPosition(WIDTH_OFFSET, HEIGHT_OFFSET + i * GRID_SIZE);
       lines_.push_back(line);
     }
   }
@@ -40,7 +41,7 @@ private:
   std::vector<sf::RectangleShape> lines_;
   float width_ = 10;
   float height_ = 10;
-  float grid_size_ = 5; // pixel
+  
   static constexpr float LINE_WIDTH = 3;
 };
 
