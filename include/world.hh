@@ -10,6 +10,7 @@
 #include "map.hh"
 #include "config.hh"
 #include "minion.hh"
+#include "obstacle.hh"
 
 namespace ed
 {
@@ -21,6 +22,7 @@ public:
     : config_{config}, map_{config.map_width, config.map_height}
   {
     minions_.emplace_back(sf::Vector2f{0, 0});
+    obstacles_.emplace_back(sf::Vector2f{0, 0});
   }
   void loop()
   {
@@ -39,7 +41,7 @@ public:
       process_event(window);
 
       ImGui::SFML::Update(window, render_clock.restart());
-      window.clear(sf::Color{20, 20, 20});
+      window.clear(sf::Color{200, 200, 200});
 
       ImGui::ShowDemoWindow();
 
@@ -61,6 +63,7 @@ private:
   bool manual_turn_ = false; // TODO: user
   bool next_turn_ = false;
   std::vector<Minion> minions_;
+  std::vector<Obstacle> obstacles_;
 
   void configure_imgui_style()
   {
@@ -151,6 +154,10 @@ private:
     for(const auto &m : minions_)
     {
       window.draw(m.sprite());
+    }
+    for(const auto &o : obstacles_)
+    {
+      window.draw(o.sprite());
     }
   }
 };
