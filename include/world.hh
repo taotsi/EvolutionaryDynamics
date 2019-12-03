@@ -61,6 +61,7 @@ private:
   sf::Clock game_clock_;
   int turn_duration_ = 500; // ms // TODO: settable by user
   bool manual_turn_ = false; // TODO: user
+  bool next_turn_ = false;
   sf::CircleShape test_circle_;
 
   void configure_imgui_style()
@@ -89,18 +90,32 @@ private:
         }
         case sf::Event::KeyPressed:
         {
-          if(event.key.code == sf::Keyboard::Space)
+          switch(event.key.code)
           {
-            if(manual_turn_ == false)
+            case sf::Keyboard::Space:
             {
-              manual_turn_ = true;
+              if(manual_turn_ == false)
+              {
+                manual_turn_ = true;
+              }
+              else
+              {
+                manual_turn_ = false;
+                game_clock_.restart();
+              }
+              break;
             }
-            else
+            case sf::Keyboard::Right:
             {
-              manual_turn_ = false;
-              game_clock_.restart();
+              next_turn_ = true;
+              break;
+            }
+            default:
+            {
+              std::cout << "a key is pressed, but nothing happened\n";
             }
           }
+          break;
         }
         default:
         {
@@ -118,6 +133,16 @@ private:
         auto p = test_circle_.getPosition();
         test_circle_.setPosition(p + sf::Vector2f{20, 10});
         clock.restart();
+      }
+    }
+    else
+    {
+      if(next_turn_)
+      {
+        auto p = test_circle_.getPosition();
+        test_circle_.setPosition(p + sf::Vector2f{20, 10});
+
+        next_turn_ = false;
       }
     }
   }
