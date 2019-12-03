@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
-#include "map.hh"
+#include "render_map.hh"
 
 namespace ed
 {
@@ -13,7 +13,7 @@ public:
     : position_{pos}, sprite_{{50, 50}}
   {
     sprite_.setFillColor({50, 50, 50});
-    auto render_pos = pos * 60.f + sf::Vector2f{Map::WIDTH_OFFSET + 5, Map::HEIGHT_OFFSET + 7}; // TODO: 60
+    auto render_pos = pos * RenderMap::SPRITE_SIZE + sf::Vector2f{RenderMap::WIDTH_OFFSET + 5, RenderMap::HEIGHT_OFFSET + 7};
     sprite_.setPosition(render_pos);
   }
   const sf::RectangleShape& sprite() const

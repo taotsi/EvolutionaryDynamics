@@ -6,24 +6,27 @@
 namespace ed
 {
 
-class Map
+class RenderMap
 {
 public:
-  static constexpr float WIDTH_OFFSET = 10;
-  static constexpr float HEIGHT_OFFSET = 10;
-  Map(size_t w, size_t h)
+  static float WIDTH_OFFSET;
+  static float HEIGHT_OFFSET;
+  static float GRID_SIZE;
+  static float SPRITE_SIZE;
+
+  RenderMap(size_t w, size_t h)
     : width_{static_cast<float>(w)},
       height_{static_cast<float>(h)}
   {
     for (int i = 0; i <= width_; i++)
     {
-      auto line = sf::RectangleShape{sf::Vector2f{LINE_WIDTH, height_ * GRID_SIZE}};
+      auto line = sf::RectangleShape{sf::Vector2f{line_width_, height_ * GRID_SIZE}};
       line.setPosition(WIDTH_OFFSET + i * GRID_SIZE, HEIGHT_OFFSET);
       lines_.push_back(line);
     }
     for (int i = 0; i <= height_; i++)
     {
-      auto line = sf::RectangleShape{sf::Vector2f{width_ * GRID_SIZE, LINE_WIDTH}};
+      auto line = sf::RectangleShape{sf::Vector2f{width_ * GRID_SIZE, line_width_}};
       line.setPosition(WIDTH_OFFSET, HEIGHT_OFFSET + i * GRID_SIZE);
       lines_.push_back(line);
     }
@@ -39,8 +42,8 @@ private:
   std::vector<sf::RectangleShape> lines_;
   float width_ = 10;
   float height_ = 10;
-  float GRID_SIZE = 60; // pixel
-  static constexpr float LINE_WIDTH = 3;
+
+  static constexpr float line_width_ = 3;
 };
 
 }

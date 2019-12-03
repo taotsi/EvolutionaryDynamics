@@ -7,7 +7,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <dbg_macro/dbg.h>
 #include "nlohmann/json.hpp"
-#include "map.hh"
+#include "render_map.hh"
 #include "config.hh"
 #include "minion.hh"
 #include "obstacle.hh"
@@ -19,7 +19,7 @@ class World
 {
 public:
   World(Config &config)
-    : config_{config}, map_{config.map_width, config.map_height}
+    : config_{config}, render_map_{config.map_width, config.map_height}
   {
     minions_.emplace_back(sf::Vector2f{0, 0});
     obstacles_.emplace_back(sf::Vector2f{0, 0});
@@ -57,10 +57,10 @@ public:
 
 private:
   Config config_;
-  Map map_;
+  RenderMap render_map_;
   sf::Clock game_clock_;
   int turn_duration_ = 500; // ms // TODO: settable by user
-  bool manual_turn_ = false; // TODO: user
+  bool manual_turn_ = false;
   bool next_turn_ = false;
   std::vector<Minion> minions_;
   std::vector<Obstacle> obstacles_;
@@ -150,7 +150,7 @@ private:
   }
   void render(sf::RenderWindow &window)
   {
-    map_.render(window);
+    render_map_.render(window);
     for(const auto &m : minions_)
     {
       window.draw(m.sprite());
