@@ -13,7 +13,7 @@ public:
     : position_{pos}, sprite_{{50, 50}}
   {
     sprite_.setFillColor({50, 50, 50});
-    auto render_pos = pos * RenderMap::SPRITE_SIZE + sf::Vector2f{RenderMap::WIDTH_OFFSET + 5, RenderMap::HEIGHT_OFFSET + 7};
+    auto render_pos = pos * RenderMap::GRID_SIZE + sf::Vector2f{RenderMap::WIDTH_OFFSET + 5, RenderMap::HEIGHT_OFFSET + 7};
     sprite_.setPosition(render_pos);
   }
   const sf::RectangleShape& sprite() const

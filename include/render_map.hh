@@ -38,6 +38,14 @@ public:
       window.draw(l);
     }
   }
+  float width() const
+  {
+    return width_;
+  }
+  float height() const
+  {
+    return height_;
+  }
 private:
   std::vector<sf::RectangleShape> lines_;
   float width_ = 10;

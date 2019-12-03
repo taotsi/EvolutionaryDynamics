@@ -22,7 +22,16 @@ public:
     : config_{config}, render_map_{config.map_width, config.map_height}
   {
     minions_.emplace_back(sf::Vector2f{0, 0});
-    obstacles_.emplace_back(sf::Vector2f{0, 0});
+    for(float w = 0; w < render_map_.width(); w += 1.f)
+    {
+      obstacles_.emplace_back(sf::Vector2f{w, 0.f});
+      obstacles_.emplace_back(sf::Vector2f{w, render_map_.height()-1.f});
+    }
+    for(float h = 1; h < render_map_.height() - 1.f; h += 1.f)
+    {
+      obstacles_.emplace_back(sf::Vector2f{0.f, h});
+      obstacles_.emplace_back(sf::Vector2f{render_map_.width() - 1.f, h});
+    }
   }
   void loop()
   {
@@ -151,13 +160,13 @@ private:
   void render(sf::RenderWindow &window)
   {
     render_map_.render(window);
-    for(const auto &m : minions_)
-    {
-      window.draw(m.sprite());
-    }
     for(const auto &o : obstacles_)
     {
       window.draw(o.sprite());
+    }
+    for(const auto &m : minions_)
+    {
+      window.draw(m.sprite());
     }
   }
 };
