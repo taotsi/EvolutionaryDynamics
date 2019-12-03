@@ -9,8 +9,7 @@
 #include "nlohmann/json.hpp"
 #include "map.hh"
 #include "config.hh"
-
-using json = nlohmann::json;
+#include "minion.hh"
 
 namespace ed
 {
@@ -19,10 +18,9 @@ class World
 {
 public:
   World(Config &config)
-    : config_{config}, map_{config.map_width, config.map_height, (config.resolution_width - Map::WIDTH_OFFSET) /config.map_width},
-      test_circle_{50}
+    : config_{config}, map_{config.map_width, config.map_height}
   {
-    test_circle_.setFillColor(sf::Color(100, 250, 50));
+    minions_.emplace_back(sf::Vector2f{0, 0});
   }
   void loop()
   {
@@ -62,7 +60,7 @@ private:
   int turn_duration_ = 500; // ms // TODO: settable by user
   bool manual_turn_ = false; // TODO: user
   bool next_turn_ = false;
-  sf::CircleShape test_circle_;
+  std::vector<Minion> minions_;
 
   void configure_imgui_style()
   {
@@ -130,8 +128,7 @@ private:
     {
       if(clock.getElapsedTime().asMilliseconds() >= turn_duration_)
       {
-        auto p = test_circle_.getPosition();
-        test_circle_.setPosition(p + sf::Vector2f{20, 10});
+        next_turn();
         clock.restart();
       }
     }
@@ -139,17 +136,22 @@ private:
     {
       if(next_turn_)
       {
-        auto p = test_circle_.getPosition();
-        test_circle_.setPosition(p + sf::Vector2f{20, 10});
-
+        next_turn();
         next_turn_ = false;
       }
     }
   }
+  void next_turn()
+  {
+    minions_[0].position(minions_[0].position() + sf::Vector2f{1.f, 1.f});
+  }
   void render(sf::RenderWindow &window)
   {
     map_.render(window);
-    window.draw(test_circle_);
+    for(const auto &m : minions_)
+    {
+      window.draw(m.sprite());
+    }
   }
 };
 

@@ -11,11 +11,9 @@ class Map
 public:
   static constexpr float WIDTH_OFFSET = 10;
   static constexpr float HEIGHT_OFFSET = 10;
-  float GRID_SIZE; // pixel
-  Map(size_t w, size_t h, size_t size)
+  Map(size_t w, size_t h)
     : width_{static_cast<float>(w)},
-      height_{static_cast<float>(h)},
-      GRID_SIZE{static_cast<float>(size)}
+      height_{static_cast<float>(h)}
   {
     for (int i = 0; i <= width_; i++)
     {
@@ -41,7 +39,7 @@ private:
   std::vector<sf::RectangleShape> lines_;
   float width_ = 10;
   float height_ = 10;
-  
+  float GRID_SIZE = 60; // pixel
   static constexpr float LINE_WIDTH = 3;
 };
 
