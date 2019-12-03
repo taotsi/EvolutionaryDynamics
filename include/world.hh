@@ -21,7 +21,7 @@ public:
   World(Config &config)
     : config_{config}, render_map_{config.map_width, config.map_height}
   {
-    minions_.emplace_back(sf::Vector2f{0, 0});
+    minions_.emplace_back(sf::Vector2f{1, 1});
     for(float w = 0; w < render_map_.width(); w += 1.f)
     {
       obstacles_.emplace_back(sf::Vector2f{w, 0.f});
@@ -155,7 +155,7 @@ private:
   }
   void next_turn()
   {
-    minions_[0].position(minions_[0].position() + sf::Vector2f{1.f, 1.f});
+    minions_[0].move(MoveDir::R);
   }
   void render(sf::RenderWindow &window)
   {
