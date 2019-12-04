@@ -1,32 +1,56 @@
 #pragma once
 #include "minion.hh"
+#include "map.hh"
 
 namespace ed
 {
 
+enum class CmdType
+{
+  None,
+  MinionMoveRight,
+  MinionMoveRandom
+};
+
 class Command
 {
 public:
+  Command(CmdType type)
+    : type_{type}
+  {
+    //
+  }
   virtual ~Command() {};
-  virtual void execute(Minion &minion) = 0;
+  virtual void execute(Minion &minion, Map &map) = 0;
 };
 
 class CmdMoveRight : public Command
 {
 public:
-  virtual void execute(Minion &minion)
+  CmdMoveRight()
+    : Command{CmdType::MinionMoveRight}
   {
-    minion.move(MoveDir::R);
+    //
+  }
+  virtual void execute(Minion &minion, Map &map)
+  {
+    minion.move(MoveDir::R, map);
   }
 };
 
 class CmdMoveRandom : public Command
 {
 public:
-  virtual void execute(Minion &minion)
+  CmdMoveRandom()
+    : Command{CmdType::MinionMoveRandom}
   {
-    minion.move(MoveDir::Random);
+    //
   }
+  virtual void execute(Minion &minion, Map &map)
+  {
+    minion.move(MoveDir::Random, map);
+  }
+
 };
 
 }

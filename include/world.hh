@@ -27,8 +27,10 @@ public:
       render_map_{config.map_width, config.map_height},
       map_{config.map_width, config.map_height}
   {
-    minions_.emplace_back(sf::Vector2f{10, 10});
-    
+    for(float i = 0; i < 5.f; i+=1.f)
+    {
+      minions_.emplace_back(sf::Vector2f{10+i, 10+i});
+    }
   }
   void loop()
   {
@@ -66,7 +68,7 @@ private:
   RenderMap render_map_;
   Map map_;
   sf::Clock game_clock_;
-  int turn_duration_ = 500; // ms // TODO: settable by user
+  int turn_duration_ = 250; // ms // TODO: settable by user
   bool manual_turn_ = false;
   bool next_turn_ = false;
   std::vector<Minion> minions_;
@@ -124,8 +126,7 @@ private:
             }
             case sf::Keyboard::Right:
             {
-              std::cout << "move right, nothing for now\n";
-              // emit_command(CmdMoveRight{});
+              emit_command<CmdMoveRight>();
               break;
             }
             case sf::Keyboard::R:
@@ -174,7 +175,10 @@ private:
     }
     while(!commands_.empty())
     {
-      commands_.front()->execute(minions_[0]);
+      for(auto &m : minions_)
+      {
+        commands_.front()->execute(m, map_);
+      }
       commands_.pop();
     }
   }

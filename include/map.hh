@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/System/Vector2.hpp>
 #include <vector>
 #include "obstacle.hh"
 
@@ -41,9 +42,9 @@ public:
   {
     return obstacles_;
   }
-  bool is_obstacle(float x, float y)
+  bool is_obstacle(sf::Vector2f pos)
   {
-    return grids_[static_cast<size_t>(x)][static_cast<size_t>(y)].is_obstacle;
+    return grids_[static_cast<size_t>(pos.x)][static_cast<size_t>(pos.y)].is_obstacle;
   }
 private:
   float width_ = 1.f;

@@ -6,6 +6,7 @@
 #include <dbg_macro/dbg.h>
 #include <little-utility/utility.hh>
 #include "render_map.hh"
+#include "map.hh"
 
 using namespace taotsi;
 
@@ -35,7 +36,7 @@ public:
     position(pos);
   }
 
-   void move(MoveDir dir)
+   void move(MoveDir dir, Map &map)
   {
     static std::map<MoveDir, sf::Vector2f> dirs{
       {MoveDir::U, {0.f, 1.f}},
@@ -47,18 +48,25 @@ public:
       {MoveDir::L, {-1.f, 0.f}},
       {MoveDir::UL, {-1.f, 1.f}},
     };
+    sf::Vector2f future_pos;
     if(dir != MoveDir::Random)
     {
-      position(position_ + dirs[dir]);
+      future_pos = position_ + dirs[dir];
     }
     else
     {
       auto r = Rand::int_random_dice(0, 7);
       auto dir = dirs.begin();
       std::advance(dir, r());
-      position(position_ + dir->second);
+      future_pos = position_ + dir->second;
+    }
+
+    if(!map.is_obstacle(future_pos))
+    {
+      position(future_pos);
     }
   }
+
   sf::Vector2f position()
   {
     return position_;
