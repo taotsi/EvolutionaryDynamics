@@ -1,16 +1,21 @@
 #pragma once
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include <imgui.h>
+#include <imgui-SFML.h>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <dbg_macro/dbg.h>
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
+#include <queue>
+#include <functional>
+#include <map>
+#include <memory>
 #include "render_map.hh"
 #include "config.hh"
 #include "minion.hh"
 #include "obstacle.hh"
+#include "command.hh"
 
 namespace ed
 {
@@ -21,7 +26,7 @@ public:
   World(Config &config)
     : config_{config}, render_map_{config.map_width, config.map_height}
   {
-    minions_.emplace_back(sf::Vector2f{1, 1});
+    minions_.emplace_back(sf::Vector2f{10, 10});
     for(float w = 0; w < render_map_.width(); w += 1.f)
     {
       obstacles_.emplace_back(sf::Vector2f{w, 0.f});
@@ -73,6 +78,7 @@ private:
   bool next_turn_ = false;
   std::vector<Minion> minions_;
   std::vector<Obstacle> obstacles_;
+  std::queue<std::shared_ptr<Command>> commands_;
 
   void configure_imgui_style()
   {
@@ -115,9 +121,23 @@ private:
               }
               break;
             }
+            case sf::Keyboard::Enter:
+            {
+              if(!next_turn_)
+              {
+                next_turn_ = true;
+              }
+              break;
+            }
             case sf::Keyboard::Right:
             {
-              next_turn_ = true;
+              std::cout << "move right, nothing for now\n";
+              // emit_command(CmdMoveRight{});
+              break;
+            }
+            case sf::Keyboard::R:
+            {
+              emit_command<CmdMoveRandom>();
               break;
             }
             default:
@@ -134,6 +154,13 @@ private:
       }
     }
   }
+
+  template<typename C>
+  void emit_command()
+  {
+    commands_.push(std::make_shared<C>());
+  }
+
   void update(sf::Clock &clock)
   {
     if(!manual_turn_)
@@ -152,10 +179,16 @@ private:
         next_turn_ = false;
       }
     }
+    while(!commands_.empty())
+    {
+      commands_.front()->execute(minions_[0]);
+      commands_.pop();
+    }
   }
+
   void next_turn()
   {
-    minions_[0].move(MoveDir::R);
+    emit_command<CmdMoveRandom>();
   }
   void render(sf::RenderWindow &window)
   {

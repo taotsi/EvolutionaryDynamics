@@ -4,7 +4,10 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <dbg_macro/dbg.h>
+#include <little-utility/utility.hh>
 #include "render_map.hh"
+
+using namespace taotsi;
 
 namespace ed
 {
@@ -18,7 +21,8 @@ enum class MoveDir
   D,
   DL,
   L,
-  UL
+  UL,
+  Random
 };
 
 class Minion
@@ -31,7 +35,6 @@ public:
     position(pos);
   }
 
-  // TODO: command pattern
    void move(MoveDir dir)
   {
     static std::map<MoveDir, sf::Vector2f> dirs{
@@ -44,7 +47,17 @@ public:
       {MoveDir::L, {-1.f, 0.f}},
       {MoveDir::UL, {-1.f, 1.f}},
     };
-    position(position_ + dirs[dir]);
+    if(dir != MoveDir::Random)
+    {
+      position(position_ + dirs[dir]);
+    }
+    else
+    {
+      auto r = Rand::int_random_dice(0, 7);
+      auto dir = dirs.begin();
+      std::advance(dir, r());
+      position(position_ + dir->second);
+    }
   }
   sf::Vector2f position()
   {
