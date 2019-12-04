@@ -8,14 +8,13 @@
 #include <dbg_macro/dbg.h>
 #include <nlohmann/json.hpp>
 #include <queue>
-#include <functional>
-#include <map>
 #include <memory>
 #include "render_map.hh"
 #include "config.hh"
 #include "minion.hh"
 #include "obstacle.hh"
 #include "command.hh"
+#include "map.hh"
 
 namespace ed
 {
@@ -24,19 +23,12 @@ class World
 {
 public:
   World(Config &config)
-    : config_{config}, render_map_{config.map_width, config.map_height}
+    : config_{config},
+      render_map_{config.map_width, config.map_height},
+      map_{config.map_width, config.map_height}
   {
     minions_.emplace_back(sf::Vector2f{10, 10});
-    for(float w = 0; w < render_map_.width(); w += 1.f)
-    {
-      obstacles_.emplace_back(sf::Vector2f{w, 0.f});
-      obstacles_.emplace_back(sf::Vector2f{w, render_map_.height()-1.f});
-    }
-    for(float h = 1; h < render_map_.height() - 1.f; h += 1.f)
-    {
-      obstacles_.emplace_back(sf::Vector2f{0.f, h});
-      obstacles_.emplace_back(sf::Vector2f{render_map_.width() - 1.f, h});
-    }
+    
   }
   void loop()
   {
@@ -72,12 +64,13 @@ public:
 private:
   Config config_;
   RenderMap render_map_;
+  Map map_;
   sf::Clock game_clock_;
   int turn_duration_ = 500; // ms // TODO: settable by user
   bool manual_turn_ = false;
   bool next_turn_ = false;
   std::vector<Minion> minions_;
-  std::vector<Obstacle> obstacles_;
+
   std::queue<std::shared_ptr<Command>> commands_;
 
   void configure_imgui_style()
@@ -193,7 +186,7 @@ private:
   void render(sf::RenderWindow &window)
   {
     render_map_.render(window);
-    for(const auto &o : obstacles_)
+    for(const auto &o : map_.obstacles())
     {
       window.draw(o.sprite());
     }
