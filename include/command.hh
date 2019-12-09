@@ -5,52 +5,101 @@
 namespace ed
 {
 
-enum class CmdType
-{
-  None,
-  MinionMoveRight,
-  MinionMoveRandom
-};
-
 class Command
 {
 public:
-  Command(CmdType type)
-    : type_{type}
-  {
-    //
-  }
+  Command(){}
   virtual ~Command() {};
-  virtual void execute(Minion &minion, Map &map) = 0;
+  virtual float execute(Minion &minion, Map &map) = 0;
 };
 
 class CmdMoveRight : public Command
 {
 public:
-  CmdMoveRight()
-    : Command{CmdType::MinionMoveRight}
+  CmdMoveRight(){}
+  virtual float execute(Minion &minion, Map &map)
   {
-    //
-  }
-  virtual void execute(Minion &minion, Map &map)
-  {
-    minion.move(MoveDir::R, map);
+    return minion.move(MoveDir::R, map); // TODO:
   }
 };
-
-class CmdMoveRandom : public Command
+class CmdMoveLeft : public Command
 {
 public:
-  CmdMoveRandom()
-    : Command{CmdType::MinionMoveRandom}
+  CmdMoveLeft(){}
+  virtual float execute(Minion &minion, Map &map)
   {
-    //
+    return minion.move(MoveDir::L, map);
   }
-  virtual void execute(Minion &minion, Map &map)
-  {
-    minion.move(MoveDir::Random, map);
-  }
-
 };
+class CmdMoveDown : public Command
+{
+public:
+  CmdMoveDown(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::D, map);
+  }
+};
+class CmdMoveUp : public Command
+{
+public:
+  CmdMoveUp(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::U, map);
+  }
+};
+
+class CmdMoveUpRight : public Command
+{
+public:
+  CmdMoveUpRight(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::UR, map);
+  }
+};
+class CmdMoveUpLeft : public Command
+{
+public:
+  CmdMoveUpLeft(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::UL, map);
+  }
+};
+class CmdMoveDownRight : public Command
+{
+public:
+  CmdMoveDownRight(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::DR, map);
+  }
+};
+class CmdMoveDownLeft : public Command
+{
+public:
+  CmdMoveDownLeft(){}
+  virtual float execute(Minion &minion, Map &map)
+  {
+    return minion.move(MoveDir::DR, map);
+  }
+};
+
+// TODO:
+// class CmdMoveRandom : public Command
+// {
+// public:
+//   CmdMoveRandom()
+//   {
+//     //
+//   }
+//   virtual float execute(Minion &minion, Map &map)
+//   {
+//     return minion.move(MoveDir::Random, map);
+//   }
+//   static constexpr float ENERGY_NEEDED = 1.f;
+// };
 
 }

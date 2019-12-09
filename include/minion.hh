@@ -36,40 +36,66 @@ public:
     position(pos);
   }
 
-   void move(MoveDir dir, Map &map)
+  float move(MoveDir dir, Map &map)
   {
     static std::map<MoveDir, sf::Vector2f> dirs{
-      {MoveDir::U, {0.f, 1.f}},
-      {MoveDir::UR, {1.f, 1.f}},
+      {MoveDir::U, {0.f, -1.f}},
+      {MoveDir::UR, {1.f, -1.f}},
       {MoveDir::R, {1.f, 0.f}},
-      {MoveDir::DR, {1.f, -1.f}},
-      {MoveDir::D, {0.f, -1.f}},
-      {MoveDir::DL, {-1.f, -1.f}},
+      {MoveDir::DR, {1.f, 1.f}},
+      {MoveDir::D, {0.f, 1.f}},
+      {MoveDir::DL, {-1.f, 1.f}},
       {MoveDir::L, {-1.f, 0.f}},
-      {MoveDir::UL, {-1.f, 1.f}},
+      {MoveDir::UL, {-1.f, -1.f}},
     };
-    sf::Vector2f future_pos;
-    if(dir != MoveDir::Random)
-    {
-      future_pos = position_ + dirs[dir];
-    }
-    else
-    {
-      auto r = Rand::int_random_dice(0, 7);
-      auto dir = dirs.begin();
-      std::advance(dir, r());
-      future_pos = position_ + dir->second;
-    }
+
+    auto future_pos = position_ + dirs[dir];
+
+    float energy_consumed = 0.f;
 
     if(!map.is_obstacle(future_pos))
     {
       position(future_pos);
+      if(dir == MoveDir::U || dir == MoveDir::D || dir == MoveDir::R || dir == MoveDir::L)
+      {
+        if(energy_left_ > 1.f) // TODO: hard code
+        {
+          consume_energy(1.f);
+          energy_consumed = 1.f;
+        }
+      }
+      else if(dir == MoveDir::UR || dir == MoveDir::DR || dir == MoveDir::DR || dir == MoveDir::UL)
+      {
+        if(energy_left_ > 1.414f)
+        {
+          consume_energy(1.414f);
+          energy_consumed = 1.414f;
+        }
+      }
     }
+    return energy_consumed;
   }
 
   sf::Vector2f position()
   {
     return position_;
+  }
+
+  float energy()
+  {
+    return energy_left_;
+  }
+  void consume_energy(float e)
+  {
+    energy_left_ -= e;
+  }
+  void restore_energy()
+  {
+    energy_left_ += 2.f; // TODO: hard code
+    if(energy_left_ > 5.f)
+    {
+      energy_left_ = 5.f;
+    }
   }
 
   const sf::RectangleShape& sprite() const
@@ -80,6 +106,7 @@ public:
 private:
   sf::Vector2f position_;
   sf::RectangleShape sprite_;
+  float energy_left_ = 2.f;
 
   void position(sf::Vector2f pos)
   {

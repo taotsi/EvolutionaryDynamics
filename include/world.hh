@@ -8,13 +8,18 @@
 #include <dbg_macro/dbg.h>
 #include <nlohmann/json.hpp>
 #include <queue>
+#include <vector>
 #include <memory>
+#include <chrono>
+#include <thread>
 #include "render_map.hh"
 #include "config.hh"
 #include "minion.hh"
 #include "obstacle.hh"
 #include "command.hh"
 #include "map.hh"
+
+using namespace std::chrono_literals;
 
 namespace ed
 {
@@ -27,11 +32,9 @@ public:
       render_map_{config.map_width, config.map_height},
       map_{config.map_width, config.map_height}
   {
-    for(float i = 0; i < 5.f; i+=1.f)
-    {
-      minions_.emplace_back(sf::Vector2f{10+i, 10+i});
-    }
+    spawn_minions();
   }
+
   void loop()
   {
     sf::ContextSettings settings;
@@ -69,11 +72,25 @@ private:
   Map map_;
   sf::Clock game_clock_;
   int turn_duration_ = 250; // ms // TODO: settable by user
-  bool manual_turn_ = false;
+  bool manual_turn_ = true;
   bool next_turn_ = false;
   std::vector<Minion> minions_;
+  std::vector<std::queue<std::shared_ptr<Command>>> commands_;
 
-  std::queue<std::shared_ptr<Command>> commands_;
+  void spawn_minions()
+  {
+    size_t population = 2;
+    commands_.resize(population);
+    for(size_t i = 0; i < population; i++)
+    {
+      minions_.emplace_back(sf::Vector2f{static_cast<float>(10+i), static_cast<float>(10+i)});
+      emit_command<CmdMoveRight>(i);
+      emit_command<CmdMoveRight>(i);
+      emit_command<CmdMoveRight>(i);
+      emit_command<CmdMoveRight>(i);
+      emit_command<CmdMoveRight>(i);
+    }
+  }
 
   void configure_imgui_style()
   {
@@ -124,14 +141,25 @@ private:
               }
               break;
             }
+            // TODO: how about two keys pressed at the same time?
             case sf::Keyboard::Right:
             {
-              emit_command<CmdMoveRight>();
+              emit_command<CmdMoveRight>(0);
               break;
             }
-            case sf::Keyboard::R:
+            case sf::Keyboard::Left:
             {
-              emit_command<CmdMoveRandom>();
+              emit_command<CmdMoveLeft>(0);
+              break;
+            }
+            case sf::Keyboard::Up:
+            {
+              emit_command<CmdMoveUp>(0);
+              break;
+            }
+            case sf::Keyboard::Down:
+            {
+              emit_command<CmdMoveDown>(0);
               break;
             }
             default:
@@ -150,9 +178,9 @@ private:
   }
 
   template<typename C>
-  void emit_command()
+  void emit_command(size_t minion_id)
   {
-    commands_.push(std::make_shared<C>());
+    commands_[minion_id].push(std::make_shared<C>());
   }
 
   void update(sf::Clock &clock)
@@ -173,20 +201,35 @@ private:
         next_turn_ = false;
       }
     }
-    while(!commands_.empty())
-    {
-      for(auto &m : minions_)
-      {
-        commands_.front()->execute(m, map_);
-      }
-      commands_.pop();
-    }
   }
 
   void next_turn()
   {
-    emit_command<CmdMoveRandom>();
+    auto n_minion = minions_.size();
+    for (size_t i = 0; i < n_minion; i++)
+    {
+      if(commands_[i].empty())
+      {
+        continue;
+      }
+      while(!commands_[i].empty())
+      {
+        auto energy_consumed = commands_[i].back()->execute(minions_[i], map_);
+        commands_[i].pop();
+        if(energy_consumed != 0)
+        {
+          minions_[i].consume_energy(energy_consumed);
+        }
+        else
+        {
+          break;
+          // TODO: execution failed, handle commands afterwards
+        }
+      }
+      minions_[i].restore_energy();
+    }
   }
+
   void render(sf::RenderWindow &window)
   {
     render_map_.render(window);
