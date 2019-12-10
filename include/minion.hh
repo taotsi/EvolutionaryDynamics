@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <iostream>
+#include <cmath>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <dbg_macro/dbg.h>
@@ -53,23 +54,19 @@ public:
 
     float energy_consumed = 0.f;
 
-    if(!map.is_obstacle(future_pos))
+    if(map.grid(future_pos).landform() != Landform::Water)
     {
-      position(future_pos);
-      if(dir == MoveDir::U || dir == MoveDir::D || dir == MoveDir::R || dir == MoveDir::L)
+      if(dir != MoveDir::Random)
       {
-        if(energy_left_ > 1.f) // TODO: hard code
+        auto origin_energy = map.grid(position_).unit_energy_to_pass();
+        auto destination_energy = map.grid(future_pos).unit_energy_to_pass();
+        auto distance = sqrtf(powf(dirs[dir].x, 2) + powf(dirs[dir].y, 2));
+
+        auto energy_consumed = (destination_energy + destination_energy) / 2.f * distance;
+        if(energy_left_ >= energy_consumed)
         {
-          consume_energy(1.f);
-          energy_consumed = 1.f;
-        }
-      }
-      else if(dir == MoveDir::UR || dir == MoveDir::DR || dir == MoveDir::DR || dir == MoveDir::UL)
-      {
-        if(energy_left_ > 1.414f)
-        {
-          consume_energy(1.414f);
-          energy_consumed = 1.414f;
+          position(future_pos);
+          consume_energy(energy_consumed);
         }
       }
     }
