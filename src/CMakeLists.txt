@@ -2,7 +2,7 @@ add_subdirectory(imgui)
 
 # ===== Library =====
 
-add_library(lib_ed world.cc render_map.cc command.cc map.cc)
+add_library(lib_ed world.cc render_map.cc command.cc map.cc a_star.cc)
 
 target_link_libraries(lib_ed lib_imgui)
 

@@ -6,6 +6,7 @@
 namespace ed
 {
 
+// TODO: merge this class to Map
 class RenderMap
 {
 public:

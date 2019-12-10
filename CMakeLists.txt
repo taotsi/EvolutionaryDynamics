@@ -23,6 +23,6 @@ add_subdirectory(tests)
 
 enable_testing()
 add_test(
-  NAME test_evolutionary_dynamics
-  COMMAND $<TARGET_FILE:test_evolutionary_dynamics> --success
+  NAME test_ed
+  COMMAND $<TARGET_FILE:test_ed> --success
 )
