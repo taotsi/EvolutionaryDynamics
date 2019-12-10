@@ -7,7 +7,10 @@ using namespace ed;
 
 TEST_CASE("set grid", "map")
 {
-
+  ed::Map map{100, 100};
+  sf::Vector2f p{1, 1};
+  map.set_grid(p, Landform::Water);
+  REQUIRE(map.grid(p).landform() == Landform::Water);
 }
 
 TEST_CASE("energy to consume", "map")

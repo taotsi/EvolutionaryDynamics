@@ -75,20 +75,6 @@ public:
     {
       grids_.push_back(temp_column);
     }
-    for(float w = 0; w < width; w += 1.f)
-    {
-      obstacles_.emplace_back(sf::Vector2f{w, 0.f});
-      obstacles_.emplace_back(sf::Vector2f{w, height -1.f});
-      grids_[static_cast<size_t>(w)][0] = Grid{Landform::Water};
-      grids_[static_cast<size_t>(w)][static_cast<size_t>(height-1)] = Grid{Landform::Water};
-    }
-    for(float h = 1; h < height_ - 1.f; h += 1.f)
-    {
-      obstacles_.emplace_back(sf::Vector2f{0.f, h});
-      obstacles_.emplace_back(sf::Vector2f{width - 1.f, h});
-      grids_[0][static_cast<size_t>(h)] = Grid{Landform::Water};
-      grids_[static_cast<size_t>(width-1)][static_cast<size_t>(h)] = Grid{Landform::Water};
-    }
   }
   const std::vector<Obstacle>& obstacles()
   {
@@ -97,6 +83,12 @@ public:
   Grid grid(sf::Vector2f pos)
   {
     return grids_[static_cast<size_t>(pos.x)][static_cast<size_t>(pos.y)];
+  }
+  void set_grid(sf::Vector2f pos, Landform landform)
+  {
+    grids_[static_cast<size_t>(pos.x)][static_cast<size_t>(pos.y)] = Grid{landform};
+    // TEMP:
+    obstacles_.emplace_back(pos);
   }
   float energy_needed(sf::Vector2f origin, MoveDir dir)
   {

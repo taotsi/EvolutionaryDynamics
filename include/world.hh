@@ -33,6 +33,18 @@ public:
       map_{config.map_width, config.map_height}
   {
     spawn_minions();
+
+    // TEMP:
+    for(float w = 0; w < config.map_width; w += 1.f)
+    {
+      map_.set_grid({w, 0.f}, Landform::Water);
+      map_.set_grid({w, config.map_height - 1.f}, Landform::Water);
+    }
+    for(float h = 1; h < config.map_height - 1.f; h += 1.f)
+    {
+      map_.set_grid({0.f, h}, Landform::Water);
+      map_.set_grid({config.map_width - 1.f, h}, Landform::Water);
+    }
   }
 
   void loop()
