@@ -87,19 +87,4 @@ public:
   }
 };
 
-// TODO:
-// class CmdMoveRandom : public Command
-// {
-// public:
-//   CmdMoveRandom()
-//   {
-//     //
-//   }
-//   virtual float execute(Minion &minion, Map &map)
-//   {
-//     return minion.move(MoveDir::Random, map);
-//   }
-//   static constexpr float ENERGY_NEEDED = 1.f;
-// };
-
 }

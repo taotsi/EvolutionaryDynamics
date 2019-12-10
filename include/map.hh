@@ -1,10 +1,24 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <vector>
+#include <map>
 #include "obstacle.hh"
 
 namespace ed
 {
+
+enum class MoveDir
+{
+  U,
+  UR,
+  R,
+  DR,
+  D,
+  DL,
+  L,
+  UL,
+  Random
+};
 
 enum class Landform
 {
@@ -83,6 +97,24 @@ public:
   Grid grid(sf::Vector2f pos)
   {
     return grids_[static_cast<size_t>(pos.x)][static_cast<size_t>(pos.y)];
+  }
+  float energy_needed(sf::Vector2f origin, MoveDir dir)
+  {
+    static std::map<MoveDir, sf::Vector2f> dirs{
+      {MoveDir::U, {0.f, -1.f}},
+      {MoveDir::UR, {1.f, -1.f}},
+      {MoveDir::R, {1.f, 0.f}},
+      {MoveDir::DR, {1.f, 1.f}},
+      {MoveDir::D, {0.f, 1.f}},
+      {MoveDir::DL, {-1.f, 1.f}},
+      {MoveDir::L, {-1.f, 0.f}},
+      {MoveDir::UL, {-1.f, -1.f}},
+    };
+    auto origin_energy = grid(origin).unit_energy_to_pass();
+    auto destination_energy = grid(origin+dirs[dir]).unit_energy_to_pass();
+    auto distance = sqrtf(powf(dirs[dir].x, 2) + powf(dirs[dir].y, 2));
+    auto energy = (destination_energy + destination_energy) / 2.f * distance;
+    return energy;
   }
 private:
   float width_ = 1.f;

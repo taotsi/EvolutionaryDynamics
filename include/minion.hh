@@ -14,19 +14,6 @@ using namespace taotsi;
 namespace ed
 {
 
-enum class MoveDir
-{
-  U,
-  UR,
-  R,
-  DR,
-  D,
-  DL,
-  L,
-  UL,
-  Random
-};
-
 class Minion
 {
 public:
@@ -39,6 +26,7 @@ public:
 
   float move(MoveDir dir, Map &map)
   {
+    // TODO: duplicated code, within map.hh
     static std::map<MoveDir, sf::Vector2f> dirs{
       {MoveDir::U, {0.f, -1.f}},
       {MoveDir::UR, {1.f, -1.f}},
@@ -52,25 +40,20 @@ public:
 
     auto future_pos = position_ + dirs[dir];
 
-    float energy_consumed = 0.f;
-
     if(map.grid(future_pos).landform() != Landform::Water)
     {
       if(dir != MoveDir::Random)
       {
-        auto origin_energy = map.grid(position_).unit_energy_to_pass();
-        auto destination_energy = map.grid(future_pos).unit_energy_to_pass();
-        auto distance = sqrtf(powf(dirs[dir].x, 2) + powf(dirs[dir].y, 2));
-
-        auto energy_consumed = (destination_energy + destination_energy) / 2.f * distance;
+        auto energy_consumed = map.energy_needed(position_, dir);
         if(energy_left_ >= energy_consumed)
         {
           position(future_pos);
           consume_energy(energy_consumed);
+          return energy_consumed;
         }
       }
     }
-    return energy_consumed;
+    return 0.f;
   }
 
   sf::Vector2f position()
